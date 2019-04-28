@@ -47,7 +47,7 @@ namespace EmpyrionXChange
             verbose = true;
             LogLevel = LogLevel.Message;
 
-            log($"**VotingRewardMod: loaded");
+            log($"**EmpyrionXChange: loaded");
 
             LoadConfiuration();
 
