@@ -25,6 +25,17 @@ Dann den Tausch per ESC oder den Button bestätigen und alles wieder aus dem Tau
 Wenn ein Tausch nicht stattgefunden hatt kann das daran liegen das nicht genügend Erze zum Tausch vorhanden waren oder das 
 Erze in das Tauschfeld gelegt wurden die in der Tauschbörse nicht getauscht werden können.
 
+## Bestand und Hilfe
+Per Fraktionschat aktivieren "/ex" oder "/ex help"
+![](Screenshots/XChangeList.png)
+
+## Tauschhandel
+1. Tauscherz wähen und per Fraktionschat aktivieren "/ex cop"
+1. Erze rein und tauschen
+![](Screenshots/XChangeCopStep1.png)
+1. Getauschte Erze entnehmen
+![](Screenshots/XChangeCopStep2.png)
+
 # EmpyrionXChange
 
 ## Installation
