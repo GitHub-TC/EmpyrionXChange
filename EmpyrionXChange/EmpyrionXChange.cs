@@ -56,8 +56,10 @@ namespace EmpyrionXChange
         }
         private void LoadConfiuration()
         {
-            Configuration = new ConfigurationManager<XChangeConfig>() { UseJSON = true };
-            Configuration.ConfigFilename = Path.Combine(EmpyrionConfiguration.SaveGameModPath, @"XChangeItems.json");
+            Configuration = new ConfigurationManager<XChangeConfig>
+            {
+                ConfigFilename = Path.Combine(EmpyrionConfiguration.SaveGameModPath, @"XChangeItems.json")
+            };
 
             var DemoInit = !File.Exists(Configuration.ConfigFilename);
 
