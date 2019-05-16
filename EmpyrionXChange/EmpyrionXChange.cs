@@ -7,6 +7,8 @@ using EmpyrionNetAPITools;
 using System.IO;
 using System;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace EmpyrionXChange
 {
@@ -20,6 +22,8 @@ namespace EmpyrionXChange
 
     public class XChangeConfig
     {
+        [JsonConverter(typeof(StringEnumConverter))]
+        public LogLevel LogLevel { get; set; } = LogLevel.Message;
         public ItemBox[] AllowedItems { get; set; }
     }
 
@@ -44,15 +48,15 @@ namespace EmpyrionXChange
         public override void Initialize(ModGameAPI dediAPI)
         {
             DediAPI = dediAPI;
-            verbose = true;
             LogLevel = LogLevel.Message;
 
             log($"**EmpyrionXChange: loaded");
 
             LoadConfiuration();
+            LogLevel = Configuration.Current.LogLevel;
 
-            ChatCommands.Add(new ChatCommand(@"/ex",                HandleOpenXChangeCall, "Hilfe und Status"));
-            ChatCommands.Add(new ChatCommand(@"/ex (?<command>.+)", HandleOpenXChangeCall, "tausche nach {was}"));
+            ChatCommands.Add(new ChatCommand(@"\\ex",                HandleOpenXChangeCall, "Hilfe und Status"));
+            ChatCommands.Add(new ChatCommand(@"\\ex (?<command>.+)", HandleOpenXChangeCall, "tausche nach {was}"));
         }
         private void LoadConfiuration()
         {
@@ -127,7 +131,7 @@ namespace EmpyrionXChange
         {
             await DisplayHelp(info.playerId, 
                 Configuration.Current.AllowedItems.Aggregate("", 
-                    (S, I) => $"{S}\n/ex {I.shortcut} => tausche in '{I.fullName}' : Bestand: {I.itemCount}"));
+                    (S, I) => $"{S}\n\\ex {I.shortcut} => tausche in '{I.fullName}' : Bestand: {I.itemCount}"));
         }
 
         private async Task ItemXChange(ChatInfo info, PlayerInfo player, ItemBox itemBox, bool aChange)

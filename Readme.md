@@ -9,15 +9,15 @@ Nach der Installation und dem Start des Mods ist hier eine Beispielkonfiguration
 [SaveGamePath]\Mods\EmpyrionXChange\XChangeItems.json
 
 ## Verwendungszweck
-* / ex in fraktion Chat für Hilfe und Lagerbestand
-* / ex [itemShortName] zum Tauschen von Items zu diesem [itemShortName] Item
+* \ex in fraktion Chat für Hilfe und Lagerbestand
+* \ex [itemShortName] zum Tauschen von Items zu diesem [itemShortName] Item
 
 ## Beispiel: Erztauschbörse
 Die Erzetauschbörse erreicht man über den Fraktionschatbefehl "/ex"
 dieser Informiert über die Erze welche getauscht werden können und wie viel Erze zum Tausch vorhanden sind.
 
 Der Tausch läuft dann wie folgt ab (nur im Fraktions-Chat möglich "mit Komma erreichbar"):
-* /es [Erzkürzel] z.B. /ex zas
+* \ex [Erzkürzel] z.B. \ex zas
 
 eingeben und die zu tauschenden Erze in das Tauschfeld legen.
 Dann den Tausch per ESC oder den Button bestätigen und alles wieder aus dem Tauschfeld nehmen.
@@ -47,6 +47,6 @@ After the installation and the start of the mod is here an example configuration
 [SaveGamePath]\Mods\EmpyrionXChange\XChangeItems.json
 
 ## Usage
-* /ex in fraction chat fot help and stockinfo
-* /ex [itemShortName] for change to this items
+* \ex in fraction chat fot help and stockinfo
+* \ex [itemShortName] for change to this items
 
