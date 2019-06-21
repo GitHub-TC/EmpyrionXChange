@@ -24,6 +24,7 @@ namespace EmpyrionXChange
     {
         [JsonConverter(typeof(StringEnumConverter))]
         public LogLevel LogLevel { get; set; } = LogLevel.Message;
+        public string CommandPrefix { get; set; } = "/\\";
         public ItemBox[] AllowedItems { get; set; }
     }
 
@@ -54,9 +55,10 @@ namespace EmpyrionXChange
 
             LoadConfiuration();
             LogLevel = Configuration.Current.LogLevel;
+            ChatCommandManager.CommandPrefix = Configuration.Current.CommandPrefix;
 
-            ChatCommands.Add(new ChatCommand(@"\\ex",                HandleOpenXChangeCall, "Hilfe und Status"));
-            ChatCommands.Add(new ChatCommand(@"\\ex (?<command>.+)", HandleOpenXChangeCall, "tausche nach {was}"));
+            ChatCommands.Add(new ChatCommand(@"ex",                HandleOpenXChangeCall, "Hilfe und Status"));
+            ChatCommands.Add(new ChatCommand(@"ex (?<command>.+)", HandleOpenXChangeCall, "tausche nach {was}"));
         }
         private void LoadConfiuration()
         {
@@ -70,6 +72,8 @@ namespace EmpyrionXChange
             Configuration.Load();
 
             if (DemoInit) DemoInitConfiguration();
+
+            Configuration.Save();
         }
 
         private void DemoInitConfiguration()
@@ -145,7 +149,7 @@ namespace EmpyrionXChange
                 title = $@"{itemBox.fullName} XChange"
             };
 
-            var result = await Request_Player_ItemExchange(int.MaxValue, exchange);
+            var result = await Request_Player_ItemExchange(Timeouts.Wait10m, exchange);
 
             SetBoxContents(player.entityId, itemBox, result.items);
             if (aChange) await ItemXChange(info, player, itemBox, false);
