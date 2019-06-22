@@ -99,7 +99,7 @@ namespace EmpyrionXChange
         {
             var outMsg = new IdMsgPrio()
             {
-                id = id,
+                id  = id,
                 msg = message
             };
             Request_InGameMessage_SinglePlayer(outMsg);
@@ -135,24 +135,33 @@ namespace EmpyrionXChange
         {
             await DisplayHelp(info.playerId, 
                 Configuration.Current.AllowedItems.Aggregate("", 
-                    (S, I) => $"{S}\n\\ex {I.shortcut} => tausche in '{I.fullName}' : Bestand: {I.itemCount}"));
+                    (S, I) => $"{S}\n{(string.IsNullOrEmpty(ChatCommandManager.CommandPrefix) ? '/' : ChatCommandManager.CommandPrefix.FirstOrDefault())}ex {I.shortcut} => tausche in '{I.fullName}' : Bestand: {I.itemCount}"));
         }
 
         private async Task ItemXChange(ChatInfo info, PlayerInfo player, ItemBox itemBox, bool aChange)
         {
             var exchange = new ItemExchangeInfo()
             {
-                buttonText = "XChange",
-                desc = "Erze in das Tauschfeld legen und tauschen (ESC oder Button), dann die Erze wieder herausnehmen",
-                id = info.playerId,
-                items = GetBoxContents(player.entityId).ToArray(),
-                title = $@"{itemBox.fullName} XChange"
+                buttonText  = "XChange",
+                desc        = "Erze in das Tauschfeld legen und tauschen (ESC oder Button), dann die Erze wieder herausnehmen",
+                id          = info.playerId,
+                items       = GetBoxContents(player.entityId).ToArray(),
+                title       = $@"{itemBox.fullName} XChange"
             };
 
-            var result = await Request_Player_ItemExchange(Timeouts.Wait10m, exchange);
+            async void eventCallback(ItemExchangeInfo B)
+            {
+                if (player.entityId != B.id) return;
 
-            SetBoxContents(player.entityId, itemBox, result.items);
-            if (aChange) await ItemXChange(info, player, itemBox, false);
+                Event_Player_ItemExchange -= eventCallback;
+
+                SetBoxContents(player.entityId, itemBox, B.items);
+                if (aChange) await ItemXChange(info, player, itemBox, false);
+            }
+
+            Event_Player_ItemExchange += eventCallback;
+
+            await Request_Player_ItemExchange(Timeouts.Wait10m, exchange);
         }
 
         public IEnumerable<ItemStack> GetBoxContents(int playerId)
@@ -172,14 +181,14 @@ namespace EmpyrionXChange
 
         private ItemStack XChangeItem(ItemStack aItem, ItemBox itemBox)
         {
-            var sourceItem = Configuration.Current.AllowedItems.FirstOrDefault(I => I.itemId == itemBox.itemId);
-            var destItem = Configuration.Current.AllowedItems.FirstOrDefault(I => I.itemId == aItem.id);
+            var sourceItem  = Configuration.Current.AllowedItems.FirstOrDefault(I => I.itemId == itemBox.itemId);
+            var destItem    = Configuration.Current.AllowedItems.FirstOrDefault(I => I.itemId == aItem.id);
 
             log($"**HandleOpenXChangeCall:xChangeItem {sourceItem?.fullName}:{sourceItem?.itemCount} -> {destItem?.fullName}:{destItem?.itemCount}");
             if (sourceItem == null || destItem == null || sourceItem.itemCount < aItem.count || sourceItem.itemId == destItem.itemId) return aItem;
 
-            sourceItem.itemCount -= aItem.count;
-            destItem.itemCount += aItem.count;
+            sourceItem.itemCount    -= aItem.count;
+            destItem.itemCount      += aItem.count;
 
             aItem.id = itemBox.itemId;
 
