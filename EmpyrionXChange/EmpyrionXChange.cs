@@ -51,7 +51,7 @@ namespace EmpyrionXChange
             DediAPI = dediAPI;
             LogLevel = LogLevel.Message;
 
-            log($"**EmpyrionXChange: loaded");
+            Log($"**EmpyrionXChange: loaded");
 
             LoadConfiuration();
             LogLevel = Configuration.Current.LogLevel;
@@ -107,7 +107,7 @@ namespace EmpyrionXChange
 
         public async Task HandleOpenXChangeCall(ChatInfo info, Dictionary<string, string> args)
         {
-            log($"**HandleOpenXChangeCall {info.type}:{info.msg} {args.Aggregate("", (s, i) => s + i.Key + "/" + i.Value + " ")}");
+            Log($"**HandleOpenXChangeCall {info.type}:{info.msg} {args.Aggregate("", (s, i) => s + i.Key + "/" + i.Value + " ")}");
 
             if (info.type == (byte)ChatType.Faction) return;
 
@@ -174,7 +174,7 @@ namespace EmpyrionXChange
             if (!currentXChange.ContainsKey(playerId)) currentXChange.Add(playerId, new List<ItemStack>());
             var currentBox = currentXChange[playerId] = contents?.ToList() ?? new List<ItemStack>();
 
-            log($"**HandleOpenXChangeCall:setBoxContents {currentBox.Aggregate("", (s, i) => s + i.id + "/" + i.count)}");
+            Log($"**HandleOpenXChangeCall:setBoxContents {currentBox.Aggregate("", (s, i) => s + i.id + "/" + i.count)}");
             currentXChange[playerId] = currentBox.Select(I => XChangeItem(I, itemBox)).ToList();
             Configuration.Save();
         }
@@ -184,7 +184,7 @@ namespace EmpyrionXChange
             var sourceItem  = Configuration.Current.AllowedItems.FirstOrDefault(I => I.itemId == itemBox.itemId);
             var destItem    = Configuration.Current.AllowedItems.FirstOrDefault(I => I.itemId == aItem.id);
 
-            log($"**HandleOpenXChangeCall:xChangeItem {sourceItem?.fullName}:{sourceItem?.itemCount} -> {destItem?.fullName}:{destItem?.itemCount}");
+            Log($"**HandleOpenXChangeCall:xChangeItem {sourceItem?.fullName}:{sourceItem?.itemCount} -> {destItem?.fullName}:{destItem?.itemCount}");
             if (sourceItem == null || destItem == null || sourceItem.itemCount < aItem.count || sourceItem.itemId == destItem.itemId) return aItem;
 
             sourceItem.itemCount    -= aItem.count;
