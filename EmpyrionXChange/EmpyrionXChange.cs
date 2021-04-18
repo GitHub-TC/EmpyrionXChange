@@ -81,14 +81,14 @@ namespace EmpyrionXChange
             Configuration.Current = new XChangeConfig() {
                 AllowedItems = new[]
                 {
-                    new ItemBox(){ itemId=2248, shortcut="mag", fullName="Magnesium" ,  itemCount=99900 },
-                    new ItemBox(){ itemId=2250, shortcut="cob", fullName="Cobalt" ,     itemCount=99900 },
-                    new ItemBox(){ itemId=2251, shortcut="sil", fullName="Silicon" ,    itemCount=99900 },
-                    new ItemBox(){ itemId=2252, shortcut="neo", fullName="Neodymium" ,  itemCount=99900 },
-                    new ItemBox(){ itemId=2253, shortcut="cop", fullName="Copper" ,     itemCount=99900 },
-                    new ItemBox(){ itemId=2254, shortcut="pro", fullName="Promethium" , itemCount=99900 },
-                    new ItemBox(){ itemId=2269, shortcut="ere", fullName="Erestrum" ,   itemCount=99900 },
-                    new ItemBox(){ itemId=2270, shortcut="zas", fullName="Zascosium" ,  itemCount=99900 },
+                    new ItemBox(){ itemId=4296, shortcut="mag", fullName="Magnesium" ,  itemCount=99900 },
+                    new ItemBox(){ itemId=4298, shortcut="cob", fullName="Cobalt" ,     itemCount=99900 },
+                    new ItemBox(){ itemId=4299, shortcut="sil", fullName="Silicon" ,    itemCount=99900 },
+                    new ItemBox(){ itemId=4300, shortcut="neo", fullName="Neodymium" ,  itemCount=99900 },
+                    new ItemBox(){ itemId=4301, shortcut="cop", fullName="Copper" ,     itemCount=99900 },
+                    new ItemBox(){ itemId=4302, shortcut="pro", fullName="Promethium" , itemCount=99900 },
+                    new ItemBox(){ itemId=4317, shortcut="ere", fullName="Erestrum" ,   itemCount=99900 },
+                    new ItemBox(){ itemId=4318, shortcut="zas", fullName="Zascosium" ,  itemCount=99900 },
                 }
             };
 
