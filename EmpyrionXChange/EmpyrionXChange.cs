@@ -149,9 +149,17 @@ namespace EmpyrionXChange
                 title       = $@"{itemBox.fullName} XChange"
             };
 
+            bool isBackpackOpenOkResult = true;
+
             async void eventCallback(ItemExchangeInfo B)
             {
                 if (player.entityId != B.id) return;
+
+                if (isBackpackOpenOkResult)
+                {
+                    isBackpackOpenOkResult = false;
+                    return;
+                }
 
                 Event_Player_ItemExchange -= eventCallback;
 
