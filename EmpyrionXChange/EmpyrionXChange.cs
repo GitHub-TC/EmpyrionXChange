@@ -9,6 +9,7 @@ using System;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using System.Collections.Concurrent;
 
 namespace EmpyrionXChange
 {
@@ -35,6 +36,18 @@ namespace EmpyrionXChange
 
         public Dictionary<int, List<ItemStack>> currentXChange = new Dictionary<int, List<ItemStack>>();
 
+        public class XChangeDialogState
+        {
+            public PlayerInfo P { get; set; }
+            public bool FirstOpen { get; set; }
+            public ItemBox ItemBox { get; internal set; }
+            public bool Change { get; internal set; }
+            public ChatInfo Info { get; internal set; }
+        }
+
+        public ConcurrentDictionary<int, XChangeDialogState> PlayerXChangeDialogState { get; set; } = new ConcurrentDictionary<int, XChangeDialogState>();
+
+
         enum ChatType
         {
             Faction = 3,
@@ -56,6 +69,7 @@ namespace EmpyrionXChange
             LoadConfiuration();
             LogLevel = Configuration.Current.LogLevel;
             ChatCommandManager.CommandPrefix = Configuration.Current.CommandPrefix;
+            Event_Player_ItemExchange += HandleXChange;
 
             ChatCommands.Add(new ChatCommand(@"ex",                HandleOpenXChangeCall, "Hilfe und Status"));
             ChatCommands.Add(new ChatCommand(@"ex (?<command>.+)", HandleOpenXChangeCall, "tausche nach {was}"));
@@ -149,27 +163,32 @@ namespace EmpyrionXChange
                 title       = $@"{itemBox.fullName} XChange"
             };
 
-            bool isBackpackOpenOkResult = true;
-
-            async void eventCallback(ItemExchangeInfo B)
+            var newState = new XChangeDialogState
             {
-                if (player.entityId != B.id) return;
+                P         = player,
+                Info      = info,
+                ItemBox   = itemBox,
+                Change    = aChange,
+                FirstOpen = true,
+            };
 
-                if (isBackpackOpenOkResult)
-                {
-                    isBackpackOpenOkResult = false;
-                    return;
-                }
-
-                Event_Player_ItemExchange -= eventCallback;
-
-                SetBoxContents(player.entityId, itemBox, B.items);
-                if (aChange) await ItemXChange(info, player, itemBox, false);
-            }
-
-            Event_Player_ItemExchange += eventCallback;
+            PlayerXChangeDialogState.AddOrUpdate(player.entityId, newState, (i, s) => newState);
 
             await Request_Player_ItemExchange(Timeouts.Wait10m, exchange);
+        }
+
+        void HandleXChange(ItemExchangeInfo B)
+        {
+            if (!PlayerXChangeDialogState.TryGetValue(B.id, out var state)) return;
+
+            if (state.FirstOpen)
+            {
+                state.FirstOpen = false;
+                return;
+            }
+
+            SetBoxContents(state.P.entityId, state.ItemBox, B.items);
+            if (state.Change) ItemXChange(state.Info, state.P, state.ItemBox, false).GetAwaiter().GetResult();
         }
 
         public IEnumerable<ItemStack> GetBoxContents(int playerId)
