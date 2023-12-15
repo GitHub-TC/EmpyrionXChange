@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using System.Collections.Concurrent;
+using static EmpyrionXChange.EmpyrionXChange;
 
 namespace EmpyrionXChange
 {
@@ -36,12 +37,21 @@ namespace EmpyrionXChange
 
         public Dictionary<int, List<ItemStack>> currentXChange = new Dictionary<int, List<ItemStack>>();
 
+        public enum DialogState
+        {
+            None,
+            InputOpen,
+            InputResult,
+            OutputOpen,
+            OutputResult
+        }
+
         public class XChangeDialogState
         {
             public PlayerInfo P { get; set; }
-            public bool FirstOpen { get; set; }
+            [JsonConverter(typeof(StringEnumConverter))]
+            public DialogState State { get; set; }
             public ItemBox ItemBox { get; internal set; }
-            public bool Change { get; internal set; }
             public ChatInfo Info { get; internal set; }
         }
 
@@ -137,7 +147,7 @@ namespace EmpyrionXChange
                     else
                     {
                         var player = await Request_Player_Info(info.playerId.ToId());
-                        await ItemXChange(info, player, currentItem, true);
+                        await ItemXChange(info, player, currentItem, DialogState.InputOpen);
                     }
 
                     break;
@@ -152,14 +162,14 @@ namespace EmpyrionXChange
                     (S, I) => $"{S}\n{(string.IsNullOrEmpty(ChatCommandManager.CommandPrefix) ? '/' : ChatCommandManager.CommandPrefix.FirstOrDefault())}ex {I.shortcut} => tausche in '{I.fullName}' : Bestand: {I.itemCount}"));
         }
 
-        private async Task ItemXChange(ChatInfo info, PlayerInfo player, ItemBox itemBox, bool aChange)
+        private async Task ItemXChange(ChatInfo info, PlayerInfo player, ItemBox itemBox, DialogState state)
         {
             var exchange = new ItemExchangeInfo()
             {
                 buttonText  = "XChange",
                 desc        = "Erze in das Tauschfeld legen und tauschen (ESC oder Button), dann die Erze wieder herausnehmen",
                 id          = info.playerId,
-                items       = GetBoxContents(player.entityId).ToArray(),
+                items       = (GetBoxContents(player.entityId) ?? new ItemStack[] { }).Concat(new ItemStack[7*7]).Take(7*7).ToArray(),
                 title       = $@"{itemBox.fullName} XChange"
             };
 
@@ -168,8 +178,7 @@ namespace EmpyrionXChange
                 P         = player,
                 Info      = info,
                 ItemBox   = itemBox,
-                Change    = aChange,
-                FirstOpen = true,
+                State     = state,
             };
 
             PlayerXChangeDialogState.AddOrUpdate(player.entityId, newState, (i, s) => newState);
@@ -180,15 +189,23 @@ namespace EmpyrionXChange
         void HandleXChange(ItemExchangeInfo B)
         {
             if (!PlayerXChangeDialogState.TryGetValue(B.id, out var state)) return;
+            Log($"**HandleOpenXChangeCall:HandleXChange {state.P.playerName}[{B.id}] -> {state.State}");
 
-            if (state.FirstOpen)
+            if (state.State == DialogState.None) return;
+            if (state.State == DialogState.InputOpen)
             {
-                state.FirstOpen = false;
+                state.State = DialogState.InputResult;
+                return;
+            }
+            if (state.State == DialogState.OutputOpen)
+            {
+                state.State = DialogState.OutputResult;
                 return;
             }
 
             SetBoxContents(state.P.entityId, state.ItemBox, B.items);
-            if (state.Change) ItemXChange(state.Info, state.P, state.ItemBox, false).GetAwaiter().GetResult();
+            if (state.State == DialogState.InputResult) ItemXChange(state.Info, state.P, state.ItemBox, DialogState.OutputOpen).GetAwaiter().GetResult();
+            else if (state.State == DialogState.OutputResult) state.State = DialogState.None;
         }
 
         public IEnumerable<ItemStack> GetBoxContents(int playerId)
